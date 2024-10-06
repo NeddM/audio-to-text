@@ -19,7 +19,7 @@ def transformarAudioEnTextoOpenAI(rutaArchivo, nombreFinal):
     texto = modelo.transcribe(rutaArchivo)
     texto = texto['text']
 
-    archivo = open(f"{nombreFinal}.txt", "a")
+    archivo = open(f"{nombreFinal}", "a")
     archivo.write(str(texto))
     archivo.close()
 
@@ -47,7 +47,7 @@ def transformarAudioEnTextoGoogle(rutaArchivo, nombreFinal):
         with archivo as origen:
             audio = r.record(origen)
             texto = r.recognize_google(audio, language='es')
-            archivo = open(f"{nombreFinal}.txt", "a")
+            archivo = open(f"{nombreFinal}", "a")
             archivo.write(str(texto))
             archivo.close()
 

@@ -31,4 +31,4 @@ runs:
 
     - name: Reading output file
       shell: bash
-      run: ls -la && cat ${{ inputs.output_file }}
+      run: cat ${{ inputs.output_file }}
