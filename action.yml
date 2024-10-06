@@ -24,14 +24,10 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        pip install argparse
-        pip install os
-        pip install math
-        pip install speechrecognition
-        pip install pydub
         pip install whisper
-        pip install torch
-        pip install torchaudio
+        pip install SpeechRecognition
+        pip install pydub
+        sudo apt install ffmpeg
 
     - name: Run Python script
       shell: bash
