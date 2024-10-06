@@ -17,17 +17,13 @@ runs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Install dependencies
+      shell: bash
+      run: sudo apt install ffmpeg
+
     - name: Install requirements
       shell: bash
       run: pip install -r $GITHUB_ACTION_PATH/src/requirements.txt
-
-    # - name: Install dependencies
-    #   shell: bash
-    #   run: |
-    #     pip install whisper
-    #     pip install SpeechRecognition
-    #     pip install pydub
-    #     sudo apt install ffmpeg
 
     - name: Run Python script
       shell: bash
