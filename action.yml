@@ -1,0 +1,26 @@
+name: Audio to text
+
+inputs:
+  audio_file:
+    description: Audio file to parse to text.
+    required: true
+  output_file:
+    description: The output text file.
+    required: true
+  model:
+    description: Model used to parse the audio (google or openai).
+    default: google
+
+runs:
+  using: composite
+  steps: 
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install requirements
+      shell: bash
+      run: pip install -r src/requirements.txt
+
+    - name: Run Python script
+      shell: bash
+      run: python src/main.py ${{ inputs.audio_file }} ${{ inputs.output_file }} ${{ inputs.model }} 

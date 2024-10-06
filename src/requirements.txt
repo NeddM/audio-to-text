@@ -1,0 +1,8 @@
+argparse
+os
+math
+speechrecognition==3.8.1
+pydub==0.25.1
+whisper==1.1
+torch==2.0.1
+torchaudio==2.0.1

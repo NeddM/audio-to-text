@@ -5,9 +5,6 @@ import speech_recognition as sr
 from pydub import AudioSegment
 import whisper
 
-
-
-
 def transformarAudioEnTextoOpenAI(rutaArchivo, nombreFinal):
     modelo = whisper.load_model('medium')
     texto = modelo.transcribe(rutaArchivo)
