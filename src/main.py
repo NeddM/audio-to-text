@@ -4,6 +4,15 @@ import math
 import speech_recognition as sr
 from pydub import AudioSegment
 import whisper
+import os
+
+def convertirMP3aWAV(rutaArchivo):
+    if rutaArchivo.lower().endswith('.mp3'):
+        audio = AudioSegment.from_mp3(rutaArchivo)
+        wav_ruta = rutaArchivo.replace('.mp3', '.wav')
+        audio.export(wav_ruta, format='wav')
+        return wav_ruta
+    return rutaArchivo
 
 def transformarAudioEnTextoOpenAI(rutaArchivo, nombreFinal):
     modelo = whisper.load_model('medium')
@@ -59,6 +68,9 @@ def main():
     archivo_salida = args.output_file_path
     modelo_seleccionado = args.model
 
+    # Convertir MP3 a WAV si es necesario
+    ruta_audio = convertirMP3aWAV(ruta_audio)
+
     # Seleccionar el modelo basado en el input
     if modelo_seleccionado == "google":
         transformarAudioEnTextoGoogle(ruta_audio, archivo_salida)
@@ -66,6 +78,6 @@ def main():
         transformarAudioEnTextoOpenAI(ruta_audio, archivo_salida)
 
 
-
 if __name__ == "__main__":
     main()
+
