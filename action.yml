@@ -19,7 +19,7 @@ runs:
 
     # - name: Install requirements
     #   shell: bash
-    #   run: pip install -r src/requirements.txt
+    #   run: pip install -r $GITHUB_ACTION_PATH/src/requirements.txt
 
     - name: Install dependencies
       shell: bash
@@ -31,4 +31,4 @@ runs:
 
     - name: Run Python script
       shell: bash
-      run: python src/main.py ${{ inputs.audio_file }} ${{ inputs.output_file }} ${{ inputs.model }} 
+      run: python $GITHUB_ACTION_PATH/src/main.py ${{ inputs.audio_file }} ${{ inputs.output_file }} ${{ inputs.model }} 
