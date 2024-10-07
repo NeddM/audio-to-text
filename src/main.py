@@ -1,11 +1,12 @@
 import argparse
-from os import remove
 import math
+import os
+from os import remove
 import speech_recognition as sr
 from pydub import AudioSegment
 import whisper
-import os
 import yt_dlp
+import uuid
 
 def convertirMP3aWAV(rutaArchivo):
     if rutaArchivo.lower().endswith('.mp3'):
@@ -16,6 +17,7 @@ def convertirMP3aWAV(rutaArchivo):
     return rutaArchivo
 
 def descargarAudioDeYoutube(url):
+    output_file = f"{uuid.uuid4()}.mp3"
     ydl_opts = {
         'format': 'bestaudio/best',
         'postprocessors': [{
@@ -23,26 +25,30 @@ def descargarAudioDeYoutube(url):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
-        'outtmpl': 'audio.mp3',
+        'outtmpl': output_file,
         'quiet': True
     }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-    return 'audio.mp3'
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+    except Exception as e:
+        print(f"Error al descargar audio: {e}")
+        return None
+    return output_file
 
 def transformarAudioEnTextoOpenAI(rutaArchivo, nombreFinal):
-    modelo = whisper.load_model('medium')
-    texto = modelo.transcribe(rutaArchivo)
-    texto = texto['text']
+    try:
+        modelo = whisper.load_model('medium')
+        texto = modelo.transcribe(rutaArchivo)
+        texto = texto['text']
 
-    with open(f"{nombreFinal}", "a") as archivo:
-        archivo.write(str(texto))
-
-    remove(rutaArchivo)
+        with open(nombreFinal, "a") as archivo:
+            archivo.write(str(texto))
+    finally:
+        remove(rutaArchivo)
 
 def transformarAudioEnTextoGoogle(rutaArchivo, nombreFinal):
     seg = 50
-
     speech = AudioSegment.from_wav(rutaArchivo)
 
     batch_size = seg * 1000
@@ -50,21 +56,25 @@ def transformarAudioEnTextoGoogle(rutaArchivo, nombreFinal):
     batches = math.ceil(duracion / seg)
 
     inicio = 0
-    for i in range(batches):
-        trozo = speech[inicio: inicio + batch_size]
-        trozo.export(f'trozo_{i}.wav', format='wav')
-        inicio += batch_size
+    try:
+        for i in range(batches):
+            trozo = speech[inicio: inicio + batch_size]
+            trozo_wav = f'trozo_{i}.wav'
+            trozo.export(trozo_wav, format='wav')
+            inicio += batch_size
 
-        r = sr.Recognizer()
+            r = sr.Recognizer()
 
-        archivo = sr.AudioFile(f"trozo_{i}.wav")
-        with archivo as origen:
-            audio = r.record(origen)
-            texto = r.recognize_google(audio, language='es')
-            with open(f"{nombreFinal}", "a") as archivo:
-                archivo.write(str(texto))
+            archivo = sr.AudioFile(trozo_wav)
+            with archivo as origen:
+                audio = r.record(origen)
+                texto = r.recognize_google(audio, language='es')
+                with open(nombreFinal, "a") as archivo:
+                    archivo.write(str(texto))
 
-        remove(f"trozo_{i}.wav")
+            remove(trozo_wav) 
+    finally:
+        remove(rutaArchivo)
 
 def main():
     parser = argparse.ArgumentParser(description="Transcribe audio files using OpenAI Whisper or Google Speech Recognition.")
@@ -82,8 +92,11 @@ def main():
         print("Operación omitida.")
         return
 
-    if fuente_audio.startswith("http"):
+    if fuente_audio.startswith("https://www.youtube.com/"):
         fuente_audio = descargarAudioDeYoutube(fuente_audio)
+        if fuente_audio is None:
+            print("Error al descargar el audio de YouTube.")
+            return
 
     fuente_audio = convertirMP3aWAV(fuente_audio)
 
