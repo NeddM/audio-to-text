@@ -5,7 +5,8 @@ from os import remove
 import speech_recognition as sr
 from pydub import AudioSegment
 import whisper
-import yt_dlp
+from pytubefix import YouTube
+from pytubefix.cli import on_progress
 import uuid
 
 def convertirMP3aWAV(rutaArchivo):
@@ -17,24 +18,24 @@ def convertirMP3aWAV(rutaArchivo):
     return rutaArchivo
 
 def descargarAudioDeYoutube(url):
-    output_file = f"{uuid.uuid4()}.mp3"
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
-        'outtmpl': output_file,
-        'quiet': True
-    }
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-    except Exception as e:
-        print(f"Error al descargar audio: {e}")
+    yt = YouTube(url, on_progress_callback=on_progress)
+    
+    # Filtra solo las corrientes de audio y selecciona la mejor calidad
+    max_audio = 0
+    audio_stream = None
+    for stream in yt.streams.filter(only_audio=True):
+        abr = int(stream.abr.replace('kbps', ''))
+        if abr > max_audio:
+            max_audio = abr
+            audio_stream = stream
+    
+    if audio_stream:
+        output_file = f"{uuid.uuid4()}.mp3"  # Nombre único para evitar sobrescritura
+        audio_stream.download(filename=output_file)
+        return output_file
+    else:
+        print("No se encontró un flujo de audio.")
         return None
-    return output_file
 
 def transformarAudioEnTextoOpenAI(rutaArchivo, nombreFinal):
     try:
@@ -45,10 +46,10 @@ def transformarAudioEnTextoOpenAI(rutaArchivo, nombreFinal):
         with open(nombreFinal, "a") as archivo:
             archivo.write(str(texto))
     finally:
-        remove(rutaArchivo)
+        remove(rutaArchivo)  # Limpia archivo temporal
 
 def transformarAudioEnTextoGoogle(rutaArchivo, nombreFinal):
-    seg = 50
+    seg = 50  # Duración del fragmento
     speech = AudioSegment.from_wav(rutaArchivo)
 
     batch_size = seg * 1000
@@ -72,9 +73,9 @@ def transformarAudioEnTextoGoogle(rutaArchivo, nombreFinal):
                 with open(nombreFinal, "a") as archivo:
                     archivo.write(str(texto))
 
-            remove(trozo_wav) 
+            remove(trozo_wav)  # Limpia archivo temporal
     finally:
-        remove(rutaArchivo)
+        remove(rutaArchivo)  # Limpia archivo temporal
 
 def main():
     parser = argparse.ArgumentParser(description="Transcribe audio files using OpenAI Whisper or Google Speech Recognition.")
@@ -92,7 +93,7 @@ def main():
         print("Operación omitida.")
         return
 
-    if fuente_audio.startswith("https://www.youtube.com/"):
+    if fuente_audio.startswith("http"):
         fuente_audio = descargarAudioDeYoutube(fuente_audio)
         if fuente_audio is None:
             print("Error al descargar el audio de YouTube.")
