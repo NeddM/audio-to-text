@@ -2,3 +2,4 @@ whisper
 SpeechRecognition
 pydub
 ffmpeg
+yt-dlp

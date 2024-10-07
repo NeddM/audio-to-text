@@ -1,44 +1,44 @@
 name: Audio to text
 
 inputs:
-  audio_file:
-    description: Audio file to parse to text.
-    required: true
-  output_file:
-    description: The output text file.
-    required: true
-  model:
-    description: Model used to parse the audio (google or openai).
-    default: google
+    audio_path_or_yt_link:
+        description: Audio file to parse to text.
+        required: false
+    output_file:
+        description: The output text file.
+        required: true
+    model:
+        description: Model used to parse the audio (google or openai).
+        default: google
 
 runs:
-  using: composite
-  steps: 
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    using: composite
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
 
-    - name: Install dependencies
-      shell: bash
-      run: sudo apt install ffmpeg
+        - name: Install dependencies
+          shell: bash
+          run: sudo apt install ffmpeg
 
-    - name: Install Rust
-      shell: bash
-      if: ${{ inputs.model }} == 'openai'
-      run: pip install setuptools-rust
-      
-    - name: Install whisper
-      shell: bash
-      if: ${{ inputs.model }} == 'openai'
-      run: pip install git+https://github.com/openai/whisper.git
+        - name: Install Rust
+          shell: bash
+          if: ${{ inputs.model }} == 'openai'
+          run: pip install setuptools-rust
 
-    - name: Install requirements
-      shell: bash
-      run: pip install -r $GITHUB_ACTION_PATH/src/requirements.txt
+        - name: Install whisper
+          shell: bash
+          if: ${{ inputs.model }} == 'openai'
+          run: pip install git+https://github.com/openai/whisper.git
 
-    - name: Run Python script
-      shell: bash
-      run: python $GITHUB_ACTION_PATH/src/main.py ${{ inputs.audio_file }} ${{ inputs.output_file }} ${{ inputs.model }} 
+        - name: Install requirements
+          shell: bash
+          run: pip install -r $GITHUB_ACTION_PATH/src/requirements.txt
 
-    - name: Reading output file
-      shell: bash
-      run: cat ${{ inputs.output_file }}
+        - name: Run Python script
+          shell: bash
+          run: python $GITHUB_ACTION_PATH/src/main.py ${{ inputs.audio_file }} ${{ inputs.output_file }} ${{ inputs.model }}
+
+        - name: Reading output file
+          shell: bash
+          run: cat ${{ inputs.output_file }}
