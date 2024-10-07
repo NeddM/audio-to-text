@@ -1,5 +1,9 @@
 name: Audio to text
 
+branding:
+    icon: volume-2
+    color: white
+
 inputs:
     audio_file:
         description: Audio file to parse to text.
