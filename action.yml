@@ -1,7 +1,7 @@
 name: Audio to text
 
 inputs:
-    audio_path_or_yt_link:
+    audio_file:
         description: Audio file to parse to text.
         required: false
     output_file:
@@ -10,6 +10,9 @@ inputs:
     model:
         description: Model used to parse the audio (google or openai).
         default: google
+    delete_audio_file:
+        description: Delete audio file at the end of the execution (true or false).
+        default: false
 
 runs:
     using: composite
@@ -37,8 +40,13 @@ runs:
 
         - name: Run Python script
           shell: bash
-          run: python $GITHUB_ACTION_PATH/src/main.py ${{ inputs.audio_path_or_yt_link }} ${{ inputs.output_file }} ${{ inputs.model }}
+          run: python $GITHUB_ACTION_PATH/src/main.py ${{ inputs.audio_file }} ${{ inputs.output_file }} ${{ inputs.model }}
+
+        - name: Delete audio file
+          shell: bash
+          if: ${{ inputs.delete_audio_file }} == 'true'
+          run: rm -r ${{ inputs.audio_file }}
 
         - name: Reading output file
           shell: bash
-          run: cat ${{ inputs.output_file }}
+          run: cat ${{ inputs.output_file }} && ls -ls
