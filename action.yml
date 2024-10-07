@@ -37,7 +37,7 @@ runs:
 
         - name: Run Python script
           shell: bash
-          run: python $GITHUB_ACTION_PATH/src/main.py ${{ inputs.audio_file }} ${{ inputs.output_file }} ${{ inputs.model }}
+          run: python $GITHUB_ACTION_PATH/src/main.py ${{ inputs.audio_path_or_yt_link }} ${{ inputs.output_file }} ${{ inputs.model }}
 
         - name: Reading output file
           shell: bash
