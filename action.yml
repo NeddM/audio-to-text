@@ -23,10 +23,12 @@ runs:
 
     - name: Install Rust
       shell: bash
+      if: ${{ inputs.model }} == 'openai'
       run: pip install setuptools-rust
-
+      
     - name: Install whisper
       shell: bash
+      if: ${{ inputs.model }} == 'openai'
       run: pip install git+https://github.com/openai/whisper.git
 
     - name: Install requirements
