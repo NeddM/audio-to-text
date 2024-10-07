@@ -49,4 +49,4 @@ runs:
 
         - name: Reading output file
           shell: bash
-          run: cat ${{ inputs.output_file }} && ls -ls
+          run: cat ${{ inputs.output_file }}
