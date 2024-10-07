@@ -21,6 +21,10 @@ runs:
       shell: bash
       run: sudo apt install ffmpeg
 
+    - name: Install Rust
+      shell: bash
+      run: pip install setuptools-rust
+
     - name: Install requirements
       shell: bash
       run: pip install -r $GITHUB_ACTION_PATH/src/requirements.txt
