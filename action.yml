@@ -1,4 +1,5 @@
 name: Audio to text
+description: Transcribes an audio file to a text file
 
 branding:
     icon: volume-2
@@ -7,13 +8,14 @@ branding:
 inputs:
     audio_file:
         description: Audio file to parse to text.
-        required: false
+        required: true
     output_file:
         description: The output text file.
         required: true
     model:
         description: Model used to parse the audio (google or openai).
         default: google
+        required: true
     delete_audio_file:
         description: Delete audio file at the end of the execution (true or false).
         default: false
