@@ -25,6 +25,10 @@ runs:
       shell: bash
       run: pip install setuptools-rust
 
+    - name: Install whisper
+      shell: bash
+      run: pip install git+https://github.com/openai/whisper.git
+
     - name: Install requirements
       shell: bash
       run: pip install -r $GITHUB_ACTION_PATH/src/requirements.txt
